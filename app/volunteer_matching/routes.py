@@ -21,18 +21,28 @@ def volunteer_matching():
         return render_template('base.html', email=session['email'], username=session['username'],
                                is_admin=session['is_admin'])
 
+    # get_volunteers()
+    # get_events()
+    # get_events()
     return render_template('volunteer_matching.html', username=session['username'])
 
 
-@matching_bp.route('/api/volunteers', methods=['GET'])
+@matching_bp.route('/api/volunteers', methods=['GET', 'POST'])
 def get_volunteers():
     global volunteers
     if len(volunteers) > 0:
         volunteers = []
 
-    cursor = conn.cursor()
+    data = request.get_json()
 
-    command = f"SELECT * FROM user_profile;"
+    cursor = conn.cursor()
+    user_id = data.get('user_id')
+
+    if session['is_admin'] or user_id == -1:
+        command = f"SELECT * FROM user_profile;"
+    else:
+        command = f"SELECT * FROM user_profile WHERE user_id = {data['user_id']};"
+
     cursor.execute(command)
     table_data = cursor.fetchall()
 
@@ -55,6 +65,7 @@ def get_volunteers():
 
         formatted_skills = row[7].split(',')
         volunteer = Volunteer(
+            user_id=row[0],
             name=row[1],
             address1=row[2],
             address2=row[3],
@@ -65,7 +76,7 @@ def get_volunteers():
             preferences=row[8],
             availability=[row[9]],
             email=email,
-            phone="(123)-456-7890",
+            # phone="(123)-456-7890",
             history=history
         )
         volunteers.append(volunteer)
@@ -109,6 +120,7 @@ def get_events():
 @matching_bp.route('/api/assign_event', methods=['POST'])
 def assign_event():
     data = request.get_json()
+    user_id = data.get('user_id')
     volunteer_name = data.get('volunteer_name')
     event_name = data.get('event_name')
 
@@ -116,12 +128,13 @@ def assign_event():
     get_events()
 
     for volunteer in volunteers:
-        if volunteer.name == volunteer_name:
+        # if volunteer.name == volunteer_name:
+        if volunteer.user_id == user_id:
             volunteer.assigned_event = event_name
             cursor = conn.cursor()
-            command = f'''SELECT user_id FROM user_profile WHERE full_name = '{volunteer_name}';'''
-            cursor.execute(command)
-            user_id = cursor.fetchone()[0]
+            # command = f'''SELECT user_id FROM user_profile WHERE full_name = '{volunteer_name}';'''
+            # cursor.execute(command)
+            # user_id = cursor.fetchone()[0]
 
             command = f'''SELECT event_id, event_date FROM event_details WHERE event_name = '{event_name}';'''
             cursor.execute(command)
@@ -133,7 +146,8 @@ def assign_event():
             cursor.execute(command)
             table_data = cursor.fetchone()
             if table_data:
-                return jsonify({"message": f"Event '{event_name}' HAS ALREADY BEEN assigned to volunteer '{volunteer_name}'."}), 200
+                return jsonify({
+                                   "message": f"Event '{event_name}' HAS ALREADY BEEN assigned to volunteer '{volunteer_name}'."}), 200
 
             command = f'''INSERT INTO volunteer_history(user_id, event_id) VALUES ('{user_id}', '{event_id}');'''
             cursor.execute(command)

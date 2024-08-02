@@ -12,17 +12,6 @@ class AuthTest(unittest.TestCase):
     def setUpClass(cls):
         cls.tester = app.test_client(cls)
 
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        with self.tester.session_transaction() as sess:
-            sess['signed_in'] = False
-            sess['email'] = ''
-            sess['username'] = ''
-            sess['user_id'] = -1
-            sess['is_admin'] = False
-
     def get_user_id_from_db(self, email):
         conn = psycopg2.connect(database="volunteers_db", user="postgres",
                                 password="arti", host="localhost", port="5432")
@@ -63,6 +52,18 @@ class AuthTest(unittest.TestCase):
         conn.close()
 
         self.user_id = -1
+
+    def setUp(self):
+        self.user_id = -1
+        self.delete_unit_test_user_in_db()
+
+    def tearDown(self):
+        with self.tester.session_transaction() as sess:
+            sess['signed_in'] = False
+            sess['email'] = ''
+            sess['username'] = ''
+            sess['user_id'] = -1
+            sess['is_admin'] = False
 
     def test_user_not_signed_in(self):
         response = self.tester.get('/profile/')
@@ -109,7 +110,7 @@ class AuthTest(unittest.TestCase):
         self.assertEqual(str.encode(val), response.data)
         self.assertEqual(200, response.status_code)
 
-        # delete the user prfile row from table user_profile
+        # delete the user profile row from table user_profile
         conn = psycopg2.connect(database="volunteers_db", user="postgres",
                                 password="arti", host="localhost", port="5432")
         cursor = conn.cursor()
@@ -151,14 +152,15 @@ class AuthTest(unittest.TestCase):
         for i, skill in enumerate(data['skills']):
             formatted_skills += skill + ("," if i < len(data['skills']) - 1 else "")
 
+        formatted_dob = "".join(str(data['dob']).split('-'))
         formatted_availability_date = "".join(str(data['availability']).split('-'))
 
         # save the user_profile
         conn = psycopg2.connect(database="volunteers_db", user="postgres",
                                 password="arti", host="localhost", port="5432")
         cursor = conn.cursor()
-        command = f'''INSERT INTO user_profile(user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability)
-                                VALUES({sess["user_id"]}, 'Old Name', 'Old Address', '{data['address2']}', '{data['city']}', '{data['state']}', '{data['zip']}', '{formatted_skills}', '{data['preferences']}', date({formatted_availability_date}::TEXT));'''
+        command = f'''INSERT INTO user_profile(user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability, dob)
+                                VALUES({sess["user_id"]}, 'Old Name', 'Old Address', '{data['address2']}', '{data['city']}', '{data['state']}', '{data['zip']}', '{formatted_skills}', '{data['preferences']}', date({formatted_availability_date}::TEXT), date({formatted_dob}::TEXT));'''
         cursor.execute(command)
         cursor.close()
         conn.commit()
@@ -218,14 +220,15 @@ class AuthTest(unittest.TestCase):
         for i, skill in enumerate(data['skills']):
             formatted_skills += skill + ("," if i < len(data['skills']) - 1 else "")
 
+        formatted_dob = "".join(str(data['dob']).split('-'))
         formatted_availability_date = "".join(str(data['availability']).split('-'))
 
         # save the user_profile
         conn = psycopg2.connect(database="volunteers_db", user="postgres",
                                 password="arti", host="localhost", port="5432")
         cursor = conn.cursor()
-        command = f'''INSERT INTO user_profile(user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability)
-                                VALUES({sess["user_id"]}, '{data['fullName']}', '{data['address1']}', '{data['address2']}', '{data['city']}', '{data['state']}', '{data['zip']}', '{formatted_skills}', '{data['preferences']}', date({formatted_availability_date}::TEXT));'''
+        command = f'''INSERT INTO user_profile(user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability, dob)
+                                VALUES({sess["user_id"]}, '{data['fullName']}', '{data['address1']}', '{data['address2']}', '{data['city']}', '{data['state']}', '{data['zip']}', '{formatted_skills}', '{data['preferences']}', date({formatted_availability_date}::TEXT), date({formatted_dob}::TEXT));'''
         cursor.execute(command)
         cursor.close()
         conn.commit()

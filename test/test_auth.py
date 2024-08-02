@@ -12,20 +12,6 @@ class AuthTest(unittest.TestCase):
     def setUpClass(cls):
         cls.tester = app.test_client(cls)
 
-    def setUp(self):
-        self.user_id = -1
-        pass
-
-    def tearDown(self):
-        with self.tester.session_transaction() as sess:
-            sess['signed_in'] = False
-            sess['email'] = ''
-            sess['username'] = ''
-            sess['user_id'] = -1
-            sess['is_admin'] = False
-
-        # self.delete_notifications_using_user_id()
-
     def get_user_id_from_db(self, email):
         conn = psycopg2.connect(database="volunteers_db", user="postgres",
                                 password="arti", host="localhost", port="5432")
@@ -84,6 +70,19 @@ class AuthTest(unittest.TestCase):
         cursor.close()
         conn.commit()
         conn.close()
+
+    def setUp(self):
+        self.user_id = -1
+        self.delete_notifications_using_user_id()
+        self.delete_unit_test_user_in_db()
+
+    def tearDown(self):
+        with self.tester.session_transaction() as sess:
+            sess['signed_in'] = False
+            sess['email'] = ''
+            sess['username'] = ''
+            sess['user_id'] = -1
+            sess['is_admin'] = False
 
     def test_canary(self):
         self.assertTrue(True)
@@ -197,13 +196,25 @@ class AuthTest(unittest.TestCase):
         self.assertEqual(str.encode(val), response.data)
         self.assertEqual(400, response.status_code)
 
+    def test_register_password_with_password_that_does_not_follow_the_requirements(self):
+        data = {
+            "email": "unit_test@domain.com",
+            "password": "1111",
+            "confirmPassword": "1111"
+        }
+
+        response = self.tester.post('/register', json=data)
+        val = '{"message":"The password should be at least 8 characters long. The password may include uppercase letters: A-Z, lowercase letters: a-z, numbers: 0-9, any of the special characters: @#$%^&+=_"}\n'
+        self.assertEqual(str.encode(val), response.data)
+        self.assertEqual(400, response.status_code)
+
     def test_register_email_already_exists(self):
         self.create_unit_test_user_in_db()
 
         data = {
             "email": "unit_test@domain.com",
-            "password": "1111",
-            "confirmPassword": "1111"
+            "password": "super_secret_password",
+            "confirmPassword": "super_secret_password"
         }
 
         response = self.tester.post('/register', json=data)
@@ -273,6 +284,18 @@ class AuthTest(unittest.TestCase):
         self.assertIn(str.encode('Reset Password'), response.data)
         self.assertEqual(200, response.status_code)
 
+    def test_reset_password_with_password_that_does_not_follow_the_requirements(self):
+        data = {
+            "email": "unit_test@domain.com",
+            "newPassword": "1111",
+            "confirmNewPassword": "1111"
+        }
+
+        response = self.tester.post('/reset', json=data)
+        val = '{"message":"The password should be at least 8 characters long. The password may include uppercase letters: A-Z, lowercase letters: a-z, numbers: 0-9, any of the special characters: @#$%^&+=_"}\n'
+        self.assertEqual(str.encode(val), response.data)
+        self.assertEqual(400, response.status_code)
+
     def test_reset_send_post_request_with_matching_password_and_existing_email(self):
         self.create_unit_test_user_in_db()
         new_password = "new_super_secret_password"
@@ -306,8 +329,8 @@ class AuthTest(unittest.TestCase):
 
         data = {
             "email": "unit_test@domain",
-            "newPassword": "1111",
-            "confirmNewPassword": "1234"
+            "newPassword": "super_secret_password",
+            "confirmNewPassword": "super_secret_password_2"
 
         }
         response = self.tester.post('/reset', json=data)
@@ -320,8 +343,8 @@ class AuthTest(unittest.TestCase):
     def test_reset_send_post_request_with_matching_password_and_non_existing_email(self):
         data = {
             "email": "unit_test@gmail.com",
-            "newPassword": "1234",
-            "confirmNewPassword": "1234"
+            "newPassword": "super_secret_password",
+            "confirmNewPassword": "super_secret_password"
 
         }
         response = self.tester.post('/reset', json=data)

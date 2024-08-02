@@ -9,9 +9,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let selectedEventElement = null;
     let selectedEvent = null;
+    const user_id = -1;
 
     // Fetch volunteers from the backend
-    fetch('/matching/api/volunteers')
+//    fetch('/matching/api/volunteers')
+        fetch('/matching/api/volunteers', {
+                method: 'POST',
+                headers: {
+                    'Accept':'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ user_id })
+        })
         .then(response => response.json())
         .then(data => {
             updateVolunteerList(data);
@@ -59,7 +68,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <p><strong>Preferences:</strong> ${selectedVolunteer.preferences}</p>
                 <p><strong>Availability:</strong> ${selectedVolunteer.availability.join(', ')}</p>
                 <p><strong>Email:</strong> ${selectedVolunteer.email}</p>
-                <p><strong>Phone:</strong> ${selectedVolunteer.phone}</p>
                 ${selectedVolunteer.assigned_event ? `<p><strong>Assigned Event:</strong> ${selectedVolunteer.assigned_event}</p>` : `<p><strong>Assigned Event: </strong> None</p>`}
             `;
         } else {
@@ -109,6 +117,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
+                    user_id: selectedVolunteer.user_id,
                     volunteer_name: selectedVolunteer.name,
                     event_name: selectedEvent.name
                 })

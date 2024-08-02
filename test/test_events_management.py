@@ -12,17 +12,6 @@ class EventManagementTest(unittest.TestCase):
     def setUpClass(cls):
         cls.tester = app.test_client(cls)
 
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        with self.tester.session_transaction() as sess:
-            sess['signed_in'] = False
-            sess['email'] = ''
-            sess['username'] = ''
-            sess['user_id'] = -1
-            sess['is_admin'] = False
-
     def get_user_id_from_db(self, email):
         conn = psycopg2.connect(database="volunteers_db", user="postgres",
                                 password="arti", host="localhost", port="5432")
@@ -63,6 +52,18 @@ class EventManagementTest(unittest.TestCase):
         conn.close()
 
         self.user_id = -1
+
+    def setUp(self):
+        self.user_id = -1
+        self.delete_unit_test_user_in_db()
+
+    def tearDown(self):
+        with self.tester.session_transaction() as sess:
+            sess['signed_in'] = False
+            sess['email'] = ''
+            sess['username'] = ''
+            sess['user_id'] = -1
+            sess['is_admin'] = False
 
     def test_event_management_signed_in_false(self):
         with self.tester.session_transaction() as sess:

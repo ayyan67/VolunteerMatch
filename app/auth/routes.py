@@ -1,6 +1,7 @@
 from flask import render_template, request, jsonify, session, Blueprint
 import bcrypt
 import psycopg2
+import re
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -75,6 +76,10 @@ def register():
         if password != confirm_password:
             return jsonify({'message': 'Passwords do not match'}), 400
 
+        if not re.fullmatch(r'[A-Za-z0-9@#$%^&+=_]{8,}', password):
+            return jsonify({
+                'message': 'The password should be at least 8 characters long. The password may include uppercase letters: A-Z, lowercase letters: a-z, numbers: 0-9, any of the special characters: @#$%^&+=_'}), 400
+
         command = f"SELECT * from usercredentials where email='{email}';"
         cursor.execute(command)
         user_exists = len(cursor.fetchall())
@@ -143,6 +148,9 @@ def reset():
 
         if new_password != confirm_new_password:
             return jsonify({'message': 'Passwords do not match'}), 400
+
+        if not re.fullmatch(r'[A-Za-z0-9@#$%^&+=_]{8,}', new_password):
+            return jsonify({'message': 'The password should be at least 8 characters long. The password may include uppercase letters: A-Z, lowercase letters: a-z, numbers: 0-9, any of the special characters: @#$%^&+=_'}), 400
 
         command = f"SELECT email FROM usercredentials where email='{email}';"
 

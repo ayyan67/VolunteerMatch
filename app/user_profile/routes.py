@@ -27,10 +27,14 @@ def profile():
         preferences = data.get('preferences')
         availability = data.get('availability')
 
+        # print(f"dob = {dob}")
+        # print(f"type(dob)= {type(dob)}")
+
         formatted_skills = ""
         for i, skill in enumerate(skills):
             formatted_skills += skill + ("," if i < len(skills) - 1 else "")
 
+        formatted_dob = "".join(str(dob).split('-'))
         formatted_availability_date = "".join(str(availability).split('-'))
 
         # check if there's already an entry in the user_profile table.
@@ -47,11 +51,12 @@ def profile():
             command = f'''UPDATE user_profile
                           SET full_name = '{full_name}', address_1 = '{address1}', address_2 = '{address2}', 
                               city = '{city}', state = '{state}', zipcode = '{zip_code}', skills = '{formatted_skills}', 
-                              preference = '{preferences}', availability = '{formatted_availability_date}'
+                              preference = '{preferences}', availability = date({formatted_availability_date}::TEXT),
+                              dob = date({formatted_dob}::TEXT)
                           WHERE user_id = {session['user_id']}'''
         else:
-            command = f'''INSERT INTO user_profile(user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability)
-                        VALUES({session["user_id"]}, '{full_name}', '{address1}', '{address2}', '{city}', '{state}', '{zip_code}', '{formatted_skills}', '{preferences}', date({formatted_availability_date}::TEXT));'''
+            command = f'''INSERT INTO user_profile(user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability, dob)
+                        VALUES({session["user_id"]}, '{full_name}', '{address1}', '{address2}', '{city}', '{state}', '{zip_code}', '{formatted_skills}', '{preferences}', date({formatted_availability_date}::TEXT), date({formatted_dob}::TEXT));'''
 
         cursor.execute(command)
         cursor.close()
@@ -71,14 +76,15 @@ def profile():
         full_name = table_data[1]
         address1, address2 = table_data[2], table_data[3]
         city, state, zipcode = table_data[4], table_data[5], table_data[6]
-        skills, preferences, availability = table_data[7], table_data[8], table_data[9]
+        skills, preferences, availability, dob = table_data[7], table_data[8], table_data[9], table_data[10]
         skills = skills.split(',')
+        print("DOB==>",dob)
     else:
         full_name = ""
         address1, address2 = "", ""
         city, state, zipcode = "", "Select your state", ""
-        skills, preferences, availability = [], "", ""
+        skills, preferences, availability, dob = [], "", "", ""
 
-    return render_template('profile.html', username=session['username'], full_name=full_name,
+    return render_template('profile.html', username=session['username'], full_name=full_name, dob=dob,
                            preferences=preferences, address1=address1, address2=address2, city=city, state=state,
                            zipcode=zipcode, availability=availability, skills=skills)

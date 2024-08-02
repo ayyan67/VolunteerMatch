@@ -2,17 +2,26 @@ document.addEventListener('DOMContentLoaded', function () {
     const volunteerList = document.getElementById('volunteer-list');
     const infoContent = document.getElementById('info-content');
     const historyTbody = document.getElementById('history-tbody');
+    const user_id = document.getElementById('user-id').textContent;
 
     let selectedVolunteerElement = null;
     let selectedVolunteer = null;
-
+//    console.log(user_id);
     // Fetch events from the backend
     fetch('/matching/api/events')
         .then(response => response.json())
         .then(data => {
             window.events = data;  
             // After events are fetched, fetch volunteers
-            return fetch('/matching/api/volunteers');
+//            return fetch('/matching/api/volunteers');
+            return fetch('/matching/api/volunteers', {
+                    method: 'POST',
+                    headers: {
+                        'Accept':'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ user_id })
+                })
         })
         .then(response => response.json())
         .then(data => {
@@ -58,8 +67,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 <p><strong>Preferences:</strong> ${selectedVolunteer.preferences}</p>
                 <p><strong>Availability:</strong> ${selectedVolunteer.availability.join(', ')}</p>
                 <p><strong>Email:</strong> ${selectedVolunteer.email}</p>
-                <p><strong>Phone:</strong> ${selectedVolunteer.phone}</p>
-                ${selectedVolunteer.assigned_event ? `<p><strong>Assigned Event:</strong> ${selectedVolunteer.assigned_event}</p>` : `<p><strong>Assigned Event: </strong> None</p>`}
             `;
         } else {
             infoContent.innerHTML = '<p>Please select a volunteer.</p>';
