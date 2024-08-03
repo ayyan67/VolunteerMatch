@@ -5,7 +5,7 @@
 -- Dumped from database version 16.3
 -- Dumped by pg_dump version 16.3
 
--- Started on 2024-07-26 20:59:34
+-- Started on 2024-08-03 16:46:49
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -98,7 +98,8 @@ CREATE TABLE public.user_profile (
     zipcode character varying(9) NOT NULL,
     skills character varying(1000) NOT NULL,
     preference character varying(1000) NOT NULL,
-    availability date NOT NULL
+    availability date NOT NULL,
+    dob date NOT NULL
 );
 
 
@@ -189,6 +190,7 @@ COPY public.notifications (user_id, msg, notification_type) FROM stdin;
 181	michael.brown signed up!	t
 180	You have been assigned the event Hiking @bayou park on 2024-08-04	f
 181	You have been assigned the event Hiking @bayou park on 2024-08-04	f
+179	You have been assigned the event Community Clean-Up Drive @UH, Main Campus on 2024-08-05	f
 \.
 
 
@@ -198,11 +200,11 @@ COPY public.notifications (user_id, msg, notification_type) FROM stdin;
 -- Data for Name: user_profile; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.user_profile (user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability) FROM stdin;
-180	 Jane Smith	Houston		Dickinson	TX	77539	Environmental Awareness,Physical Fitness,Teamwork,Event Planning		2024-07-30
-181	Michael Brown	3515 Hughes Ln		Dickinson	TX	77539	Mentoring,Conflict Resolution,Creativity,Customer Service		2024-08-25
-178	Arti N Patel	brickstone villa	1606 82nd St	 Lubbock	TX	79423	Environmental Awareness,Physical Fitness,Teamwork,Event Planning,Public Speaking,Organization,Customer Service,Lifting,Patience,Communication,Mentoring,Conflict Resolution,Creativity,Customer Service		2024-07-26
-179	John Doe	3515 Hughes Ln		Dickinson	TX	77539	Mentoring,Conflict Resolution,Creativity		2024-07-30
+COPY public.user_profile (user_id, full_name, address_1, address_2, city, state, zipcode, skills, preference, availability, dob) FROM stdin;
+178	Arti N Patel	brickstone villa	1606 82nd St	 Lubbock	TX	79423	Environmental Awareness,Physical Fitness,Teamwork,Event Planning,Public Speaking,Organization,Customer Service,Lifting,Patience,Communication,Mentoring,Conflict Resolution,Creativity,Customer Service		2024-07-26	1998-06-21
+180	 Jane Smith	Houston		Dickinson	TX	77539	Environmental Awareness,Physical Fitness,Teamwork,Event Planning		2024-07-30	2000-08-20
+179	John Doe	3515 Hughes Ln		Dickinson	TX	77539	Mentoring,Conflict Resolution,Creativity		2024-07-30	2001-08-21
+181	Michael Brown	3515 Hughes Ln		Dickinson	TX	77539	Mentoring,Conflict Resolution,Creativity,Customer Service		2024-08-25	1999-06-12
 \.
 
 
@@ -229,6 +231,7 @@ COPY public.usercredentials (id, username, email, password, is_admin) FROM stdin
 COPY public.volunteer_history (history_id, user_id, event_id) FROM stdin;
 44	180	48
 45	181	48
+49	179	49
 \.
 
 
@@ -238,7 +241,7 @@ COPY public.volunteer_history (history_id, user_id, event_id) FROM stdin;
 -- Name: event_details_event_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.event_details_event_id_seq', 49, true);
+SELECT pg_catalog.setval('public.event_details_event_id_seq', 53, true);
 
 
 --
@@ -247,7 +250,7 @@ SELECT pg_catalog.setval('public.event_details_event_id_seq', 49, true);
 -- Name: usercredentials_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.usercredentials_id_seq', 181, true);
+SELECT pg_catalog.setval('public.usercredentials_id_seq', 199, true);
 
 
 --
@@ -256,7 +259,7 @@ SELECT pg_catalog.setval('public.usercredentials_id_seq', 181, true);
 -- Name: volunteer_history_history_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.volunteer_history_history_id_seq', 45, true);
+SELECT pg_catalog.setval('public.volunteer_history_history_id_seq', 49, true);
 
 
 --
@@ -331,7 +334,7 @@ ALTER TABLE ONLY public.notifications
     ADD CONSTRAINT user_id FOREIGN KEY (user_id) REFERENCES public.usercredentials(id);
 
 
--- Completed on 2024-07-26 20:59:34
+-- Completed on 2024-08-03 16:46:50
 
 --
 -- PostgreSQL database dump complete
