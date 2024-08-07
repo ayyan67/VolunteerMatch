@@ -3,8 +3,8 @@ Volunteer Match is a comprehensive web application designed to manage volunteers
 
 
 <div align="center">
-  <img src="figure_login_page.png" alt="Login Page" width="400" height="200"/>
-  <img src="figure_pages_overview.png" alt="Pages Overview" width="400" height="200"/>
+  <img src="figure_login_page.png" alt="Login Page" width="490" height="300"/>
+  <img src="figure_pages_overview.png" alt="Pages Overview" width="490" height="300"/>
 </div>
 
 
