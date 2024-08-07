@@ -231,22 +231,4 @@ To run the tests using pytest and generate a coverage report:
   - Retrieve volunteer history
   - Response: `[{ volunteer_name, event_name, status, date }]`
 
-## Images
-
-### Login Page
-
-![Login Page](path_to_login_page_image)
-
-### Other Pages
-
-Below are images showcasing various other pages of the application:
-
-![Page 1](path_to_page_1_image)
-![Page 2](path_to_page_2_image)
-![Page 3](path_to_page_3_image)
-
-Feel free to update the paths to the images accordingly.
-
----
-
 Thank you for using Volunteer Match! If you have any questions or encounter any issues, please refer to our documentation or contact support.
