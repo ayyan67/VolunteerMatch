@@ -1,6 +1,6 @@
 # Volunteer Match
 
-![Login Page](path_to_login_page_image)
+![Login Page](figures/)
 ![Page 1](path_to_page_1_image)
 ![Page 2](path_to_page_2_image)
 ![Page 3](path_to_page_3_image)
