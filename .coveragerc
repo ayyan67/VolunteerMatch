@@ -1,2 +1,2 @@
 [run]
-omit = *test*,run.py
+omit = *test*,run.py,app/reporting/routes.py

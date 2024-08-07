@@ -15,7 +15,6 @@ def profile():
 
     if request.method == 'POST':
         data = request.get_json()
-        email = data.get('email')
         full_name = data.get('fullName')
         dob = data.get('dob')
         address1 = data.get('address1')
@@ -26,9 +25,6 @@ def profile():
         skills = data.get('skills')
         preferences = data.get('preferences')
         availability = data.get('availability')
-
-        # print(f"dob = {dob}")
-        # print(f"type(dob)= {type(dob)}")
 
         formatted_skills = ""
         for i, skill in enumerate(skills):
@@ -47,7 +43,7 @@ def profile():
         cursor.execute(command)
         table_data = cursor.fetchone()
 
-        if table_data:  # profile row already exists
+        if table_data:  # profile row already exists, so just update.
             command = f'''UPDATE user_profile
                           SET full_name = '{full_name}', address_1 = '{address1}', address_2 = '{address2}', 
                               city = '{city}', state = '{state}', zipcode = '{zip_code}', skills = '{formatted_skills}', 
@@ -78,7 +74,6 @@ def profile():
         city, state, zipcode = table_data[4], table_data[5], table_data[6]
         skills, preferences, availability, dob = table_data[7], table_data[8], table_data[9], table_data[10]
         skills = skills.split(',')
-        print("DOB==>",dob)
     else:
         full_name = ""
         address1, address2 = "", ""
