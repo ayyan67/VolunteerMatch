@@ -1,9 +1,11 @@
 # Volunteer Match
 Volunteer Match is a comprehensive web application designed to manage volunteers and events efficiently. Built using Flask for the backend, PostgreSQL for the database, and HTML/CSS/JavaScript for the frontend, Volunteer Match offers robust features to streamline volunteer management.
 
-![Login Page](figure_login_page.png)
-![Page 1](figure_pages_overview.png)
 
+<div align="center">
+  <img src="figure_login_page.png" alt="Login Page" width="400"/>
+  <img src="figure_pages_overview.png" alt="Pages Overview" width="400"/>
+</div>
 
 
 ## Table of Contents
