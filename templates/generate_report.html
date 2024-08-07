@@ -1,0 +1,102 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== REMIXICONS ===============-->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="../static/css/styles.css">
+
+    <title>Dashboard - We Love Volunteering</title>
+</head>
+<div class="container">
+    <div class="header">
+        <h2>Welcome, <span id="username">{{ username }}</span></h2>
+        <div class="header-icons">
+            <a href="/base" class="icon-link">Dashboard<i class="ri-dashboard-line"></i></a>
+            <a href="/profile" class="icon-link">Profile <i class="ri-user-line"></i></a>
+            <a href="/notifications" class="icon-link">Notification <i class="ri-notification-line"></i></a>
+            <a href="/logout" class="icon-link">Logout <i class="ri-logout-box-line"></i></a>
+        </div>
+    </div>
+    
+    <div class="content">
+        <div class="title-container">
+            <h1 class="main-title">Generate <span>Report</span></h1>
+        </div>
+        <div class="event__form">
+            <form action="{{ url_for('reporting.generate_report') }}" method="post" id="reportForm">
+                <div class="form-group">
+                    <label for="report_type" class="login__label">Report Type:</label>
+                    <select name="report_type" id="report_type" class="login__input" required>
+                        <option value="">Select a report type</option>
+                        <option value="volunteer_participation">Volunteers and Participation History</option>
+                        <option value="event_details">Event Details and Volunteer Assignments</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="report_format" class="login__label">Report Format:</label>
+                    <select name="report_format" id="report_format" class="login__input" required>
+                        <option value="">Select a format</option>
+                        <option value="pdf">PDF</option>
+                        <option value="csv">CSV</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="start_date" class="login__label">Start Date:</label>
+                    <input type="date" name="start_date" id="start_date" class="login__input" required>
+                </div>
+                <div class="form-group">
+                    <label for="end_date" class="login__label">End Date:</label>
+                    <input type="date" name="end_date" id="end_date" class="login__input" required>
+                </div>
+                <button type="submit" class="login__button">Generate Report</button>
+            </form>
+        </div>
+    </div>
+
+    <footer class="footer">
+        &copy; 2024 We Love Volunteering. All rights reserved.
+    </footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('reportForm');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+            const reportType = formData.get('report_type');
+            const reportFormat = formData.get('report_format');
+            const startDate = formData.get('start_date');
+            const endDate = formData.get('end_date');
+            const reportName = `${reportType}_${startDate}_to_${endDate}.${reportFormat}`;
+            
+            fetch("{{ url_for('reporting.generate_report') }}", {
+                method: 'POST',
+                body: formData
+            })
+            .then(function(response) {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('Network response was not ok.');
+            })
+            .then(function(blob) {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = reportName;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('An error occurred while generating the report. Please try again.');
+            });
+        });
+    });
+</script>

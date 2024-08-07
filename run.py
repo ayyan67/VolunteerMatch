@@ -5,6 +5,7 @@ from app.events_management.routes import events_bp
 from app.volunteer_matching.routes import matching_bp
 from app.notifications.routes import notifications_bp
 from app.volunteer_history.routes import history_bp
+from app.reporting.routes import reporting_bp
 # import psycopg2
 
 app = Flask(__name__)
@@ -36,6 +37,8 @@ app.register_blueprint(events_bp, url_prefix='/events')
 app.register_blueprint(matching_bp, url_prefix='/matching')
 app.register_blueprint(notifications_bp, url_prefix='/notifications')
 app.register_blueprint(history_bp, url_prefix='/history')
+app.register_blueprint(reporting_bp, url_prefix='/reporting')
+
 
 if __name__ == '__main__':
     app.run(debug=True)
